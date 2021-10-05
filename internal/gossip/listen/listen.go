@@ -2,25 +2,34 @@ package listen
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log"
-	"math"
-	"time"
+	"net"
 )
 
-func Listen(ctx context.Context) error {
-	for i := 0; i < 200; i++ {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-			time.Sleep(10 * time.Millisecond)
-			_ = math.Atan(math.Cos(math.Sin(float64(i))))
-			fmt.Print("c")
-		}
+const (
+	maxDatagramSize = 8192
+)
+
+func Listen(ctx context.Context /*wtr io.Writer,*/, addrStr string) error {
+	addr, err := net.ResolveUDPAddr("udp4", addrStr)
+	if err != nil {
+		return err
 	}
-	fmt.Println()
-	log.Printf("Client %v", &ctx)
-	return errors.New("BAD")
+
+	conn, err := net.ListenMulticastUDP("udp4", nil, addr)
+	if err != nil {
+		return err
+	}
+
+	conn.SetReadBuffer(maxDatagramSize)
+
+	for {
+		buffer := make([]byte, maxDatagramSize)
+		numBytes, _, err := conn.ReadFromUDP(buffer)
+		if err != nil {
+			return err
+		}
+
+		log.Print(string(buffer[:numBytes]))
+	}
 }

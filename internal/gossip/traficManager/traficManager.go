@@ -2,40 +2,45 @@ package traficmanager
 
 import (
 	"math/rand"
+	"sync"
 	"time"
 )
 
-type TraficControler interface {
-	Speak() bool
-}
-
 type TraficManager struct {
+	sync.Mutex
 	uptime    uint32
 	sleep     uint32
 	semaphore bool
 }
 
 func (tm *TraficManager) Speak() bool {
-	//fmt.Println(tm.semaphore)
+	tm.Lock()
+	defer tm.Unlock()
 	return tm.semaphore
 }
 
 func (tm *TraficManager) Init(minUptime, maxUptime, minSleep, maxSleep uint32) {
+	tm.Lock()
 	rand.Seed(time.Now().Unix())
 	tm.uptime = minUptime + uint32(rand.Int31n(int32(maxUptime-minUptime+1)))
 	tm.sleep = minSleep + uint32(rand.Int31n(int32(maxSleep-minSleep+1)))
 	tm.semaphore = true
-	go interrupt(tm.uptime, tm.sleep, &tm.semaphore)
+	tm.Unlock()
+	go tm.interrupt()
 }
 
-func interrupt(uptime, sleep uint32, sem *bool) {
+func (tm *TraficManager) interrupt() {
 	for {
-		if *sem {
-			time.Sleep(time.Duration(uptime) * time.Second)
-			*sem = !(*sem)
+		if tm.semaphore {
+			time.Sleep(time.Duration(tm.uptime) * time.Second)
+			tm.Lock()
+			tm.semaphore = !(tm.semaphore)
+			tm.Unlock()
 		} else {
-			time.Sleep(time.Duration(sleep) * time.Second)
-			*sem = !(*sem)
+			time.Sleep(time.Duration(tm.sleep) * time.Second)
+			tm.Lock()
+			tm.semaphore = !(tm.semaphore)
+			tm.Unlock()
 		}
 	}
 }
