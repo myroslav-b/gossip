@@ -16,6 +16,7 @@ import (
 )
 
 var opts struct {
+	NameSender      string `short:"n" long:"name" env:"NAME_SENDER" default:"" description:"name of sender of messages "`
 	AddrGroup       string `short:"a" long:"address" env:"ADDRESS_GROUP" default:"239.254.0.1:3301" description:"address multicast group"`
 	MinUptimeServer uint32 `short:"u" long:"minuptime" env:"MIN_UPTIME_SERVER" default:"3" description:"minimum uptime of multicast server in seconds"`
 	MaxUptimeServer uint32 `short:"U" long:"maxuptime" env:"MAX_UPTIME_SERVER" default:"4" description:"maximum uptime of multicast server in seconds"`
@@ -41,10 +42,8 @@ func main() {
 
 	g, ctx := errgroup.WithContext(context.Background())
 
-	//var b strings.Builder
-
-	content := contentmanager.New()
-
+	content := contentmanager.New(os.Stdin, opts.NameSender)
+	//content := contentmanager.New(bufio.NewReader(os.Stdin))
 	g.Go(func() error {
 		return content.Manager(ctx)
 	})
@@ -53,12 +52,10 @@ func main() {
 		return listen.Listen(ctx /*&b,*/, opts.AddrGroup)
 	})
 
-	tm := new(traficmanager.TraficManager)
-	tm.Init(opts.MinUptimeServer, opts.MaxUptimeServer, opts.MinSleepServer, opts.MaxSleepServer)
+	tm := traficmanager.New(ctx, opts.MinUptimeServer, opts.MaxUptimeServer, opts.MinSleepServer, opts.MaxSleepServer)
 
 	g.Go(func() error {
 		return talk.Talk(ctx, content, tm, opts.AddrGroup, opts.FreqSendServer)
-		//return talk.Talk(ctx, strings.NewReader("а аб абр абра абрак абрака абракад абракада абракадаб абракадабр абракадабра"), tm, opts.AddrGroup, opts.FreqSendServer)
 	})
 
 	err := g.Wait()

@@ -24,12 +24,17 @@ func Listen(ctx context.Context /*wtr io.Writer,*/, addrStr string) error {
 	conn.SetReadBuffer(maxDatagramSize)
 
 	for {
-		buffer := make([]byte, maxDatagramSize)
-		numBytes, _, err := conn.ReadFromUDP(buffer)
-		if err != nil {
-			return err
-		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			buffer := make([]byte, maxDatagramSize)
+			numBytes, _, err := conn.ReadFromUDP(buffer)
+			if err != nil {
+				return err
+			}
 
-		log.Print(string(buffer[:numBytes]))
+			log.Print(string(buffer[:numBytes]))
+		}
 	}
 }

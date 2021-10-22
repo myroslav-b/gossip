@@ -20,6 +20,7 @@ func Talk(ctx context.Context, rdr io.Reader, tc TraficControler, addrStr string
 			if tc.Speak() {
 				err := sendMessage(rdr, addrStr)
 				if err != nil {
+					//log.Printf("[ERROR] %+v", err)
 					return err
 				}
 			}
