@@ -33,7 +33,6 @@ func TestContentManager_1(t *testing.T) {
 
 	buf := make([]byte, 8)
 	buf = append(buf[:0], []byte("********")...)
-	//buf = append(buf[:0], []byte("xxxxx")...)
 
 	n, err := cont.Read(buf)
 
@@ -69,7 +68,6 @@ func TestContentManager_2(t *testing.T) {
 
 	buf := make([]byte, 8)
 	buf = append(buf[:0], []byte("********")...)
-	//buf = append(buf[:0], []byte("xxx")...)
 
 	n, err := cont.Read(buf)
 
@@ -105,10 +103,9 @@ func TestContentManager_3(t *testing.T) {
 
 	buf := make([]byte, 8)
 	buf = append(buf[:0], []byte("********")...)
-	//buf = append(buf[:0], []byte("xxx")...)
 
+	cont.Read(buf)
 	n, err := cont.Read(buf)
-	n, err = cont.Read(buf)
 
 	if (n != len([]byte("otwotwot"))) || (err != nil) || (!reflect.DeepEqual(buf, []byte("otwotwot"))) {
 		t.Errorf("\nWant: %v, %v, %v\n got: %v, %v, %v\n", len([]byte("otwotwot")), nil, []byte("otwotwot"), n, err, buf)
@@ -142,11 +139,10 @@ func TestContentManager_4(t *testing.T) {
 
 	buf := make([]byte, 8)
 	buf = append(buf[:0], []byte("********")...)
-	//buf = append(buf[:0], []byte("xxx")...)
 
+	cont.Read(buf)
+	cont.Read(buf)
 	n, err := cont.Read(buf)
-	n, err = cont.Read(buf)
-	n, err = cont.Read(buf)
 
 	if (n != len([]byte("6789"))) || (err != io.EOF) || (!reflect.DeepEqual(buf, []byte("67892345"))) {
 		t.Errorf("\nWant: %v, %v, %v\n got: %v, %v, %v\n", len([]byte("6789")), io.EOF, []byte("67892345"), n, err, buf)
@@ -183,12 +179,11 @@ func TestContentManager_5(t *testing.T) {
 
 	buf := make([]byte, 8)
 	buf = append(buf[:0], []byte("********")...)
-	//buf = append(buf[:0], []byte("xxx")...)
 
+	cont.Read(buf)
+	cont.Read(buf)
+	cont.Read(buf)
 	n, err := cont.Read(buf)
-	n, err = cont.Read(buf)
-	n, err = cont.Read(buf)
-	n, err = cont.Read(buf)
 
 	if (n != len([]byte("three"))) || (err != io.EOF) || (!reflect.DeepEqual(buf, []byte("three345"))) {
 		t.Errorf("\nWant: %v, %v, %v\n got: %v, %v, %v\n", len([]byte("three")), io.EOF, []byte("three345"), n, err, buf)
@@ -228,13 +223,12 @@ func TestContentManager_6(t *testing.T) {
 
 	buf := make([]byte, 8)
 	buf = append(buf[:0], []byte("********")...)
-	//buf = append(buf[:0], []byte("xxx")...)
 
+	cont.Read(buf)
+	cont.Read(buf)
+	cont.Read(buf)
+	cont.Read(buf)
 	n, err := cont.Read(buf)
-	n, err = cont.Read(buf)
-	n, err = cont.Read(buf)
-	n, err = cont.Read(buf)
-	n, err = cont.Read(buf)
 
 	if (n != len([]byte(""))) || (err != io.EOF) || (!reflect.DeepEqual(buf, []byte("three345"))) {
 		t.Errorf("\nWant: %v, %v, %v\n got: %v, %v, %v\n", len([]byte("")), io.EOF, []byte("three345"), n, err, buf)

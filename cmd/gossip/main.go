@@ -28,8 +28,6 @@ var opts struct {
 
 var revision string //Inject build-time variables
 
-var ctx context.Context
-
 func main() {
 
 	if err := parseOpts(); err != nil {
@@ -43,7 +41,7 @@ func main() {
 	g, ctx := errgroup.WithContext(context.Background())
 
 	content := contentmanager.New(os.Stdin, opts.NameSender)
-	//content := contentmanager.New(bufio.NewReader(os.Stdin))
+
 	g.Go(func() error {
 		return content.Manager(ctx)
 	})
@@ -71,10 +69,10 @@ func parseOpts() error {
 		return err
 	}
 	if opts.MinUptimeServer > opts.MaxUptimeServer {
-		return errors.New("Bad options")
+		return errors.New("bad options")
 	}
 	if opts.MinUptimeServer > opts.MaxUptimeServer {
-		return errors.New("Bad options")
+		return errors.New("bad options")
 	}
 	return nil
 }

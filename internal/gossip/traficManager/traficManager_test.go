@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-//Schrödinger test
+//Schrödinger test ;)
 func TestTraficManager(t *testing.T) {
 	uptime := 2  //sec
 	sleep := 1   //sec
