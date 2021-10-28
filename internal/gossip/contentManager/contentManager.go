@@ -9,7 +9,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"sync/atomic"
 )
 
 /*type contentInteractor interface {
@@ -17,13 +16,17 @@ import (
 	Say([]byte, int) error
 }*/
 
+const powerRingBuf = 64
+
 var ErrContentBufferEmpty = errors.New("Content Buffer Empty")
 
 type Content struct {
 	sync.Mutex
-	reader io.Reader
-	name   string
-	ring   ringBuf
+	reader        io.Reader
+	name          string
+	ring          ringBuf
+	queueRead     []byte
+	markQueueRead int
 	//cont   []byte
 	//rCont  bytes.Reader
 }
@@ -122,40 +125,41 @@ func New(r io.Reader, name string) *Content {
 }*/
 
 func (c *Content) Manager(ctx context.Context) error {
-	var atomicHaltInput atomic.Value
+	//var atomicHaltInput atomic.Value
 	var errInput error
 	//go c.input(&errInput)
 	go func() {
-		b := true
-		bts := []byte{}
-		scanner := bufio.NewScanner(c.reader)
-		c.Lock()
-		cont := []byte(strings.Join([]string{c.name, ": "}, ""))
-		c.Unlock()
-		for scanner.Scan() {
-			if atomicHaltInput.Load().(bool) {
+		for {
+			scanner := bufio.NewScanner(c.reader)
+			c.Lock()
+			prefix := []byte(strings.Join([]string{c.name, ": "}, ""))
+			c.Unlock()
+			for scanner.Scan() {
+				/*if atomicHaltInput.Load().(bool) {
+					return
+				}*/
+				bts := scanner.Bytes()
+				cont := prefix
+				cont = append(cont, bts...)
+				c.Lock()
+				b := c.ring.add(cont)
+				c.Unlock()
+				if !b {
+					log.Printf("[WARNING] skipped data: content buffer full")
+				}
+			}
+			err := scanner.Err()
+			if err != nil {
+				errInput = err
 				return
 			}
-			bts = scanner.Bytes()
-			cont = append(cont, bts...)
-			c.Lock()
-			b = c.ring.add(cont)
-			c.Unlock()
-			if !b {
-				log.Printf("[WARNING] skipped data: content buffer full")
-			}
-		}
-		err := scanner.Err()
-		if err != nil {
-			errInput = err
-			return
 		}
 	}()
 	for {
 		select {
 		case <-ctx.Done():
 			//haltInput = true
-			atomicHaltInput.Store(true)
+			//atomicHaltInput.Store(true)
 			return ctx.Err()
 		default:
 			if errInput != nil {
@@ -166,22 +170,52 @@ func (c *Content) Manager(ctx context.Context) error {
 }
 
 func (c *Content) Read(buf []byte) (n int, err error) {
+	b := false
 	c.Lock()
 	defer c.Unlock()
-	bts, b := c.ring.sub()
-	if !b {
-		buf = bts
-		return 0, ErrContentBufferEmpty
+
+	if c.markQueueRead == 0 {
+		c.queueRead, b = c.ring.sub()
+		if !b {
+			//buf = buf[:0]
+			c.markQueueRead = 0
+			return 0, ErrContentBufferEmpty
+		}
 	}
-	buf = bts
-	return len(buf), nil
+
+	switch {
+	case c.markQueueRead+len(buf) < len(c.queueRead):
+		//buf = append(buf[:0], c.queueRead[c.markQueueRead:len(buf)]...)
+		l := len(buf)
+		for i := 0; i < l; i++ {
+			buf[i] = c.queueRead[c.markQueueRead+i]
+		}
+		c.markQueueRead = c.markQueueRead + len(buf)
+		return l, nil
+	case c.markQueueRead+len(buf) >= len(c.queueRead):
+		//buf = append(buf[:0], c.queueRead[c.markQueueRead:len(c.queueRead)]...)
+		l := len(c.queueRead) - c.markQueueRead
+		for i := 0; i < l; i++ {
+			buf[i] = c.queueRead[c.markQueueRead+i]
+		}
+		//buf = append(buf,)
+		c.markQueueRead = 0
+		return l, io.EOF
+	default:
+		return 0, errors.New("ErrImpossible")
+	}
 }
 
 /*func (c *Content) Read(buf []byte) (n int, err error) {
 	c.Lock()
 	defer c.Unlock()
-	n, err = c.rCont.Read(buf)
-	c.cont = []byte{}
-	c.cont = []byte(strings.Join([]string{c.name, ": "}, ""))
-	return n, err
+	bts, b := c.ring.sub()
+	fmt.Println(bts)
+	if !b {
+		//buf = bts
+		buf = []byte{}
+		return 0, io.EOF //ErrContentBufferEmpty
+	}
+	buf = bts
+	return len(buf), io.EOF
 }*/

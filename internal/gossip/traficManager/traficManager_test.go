@@ -1,7 +1,6 @@
 package traficmanager
 
 import (
-	"context"
 	"testing"
 	"time"
 )
@@ -13,7 +12,7 @@ func TestTraficManager(t *testing.T) {
 	tikMs := 100 //duration in msec
 	repeat := 10 //number of repetitions
 
-	tm := New(context.Background(), uint32(uptime), uint32(uptime), uint32(sleep), uint32(sleep))
+	tm := New(uint32(uptime), uint32(uptime), uint32(sleep), uint32(sleep))
 
 	u, s := 0, 0
 	for i := 0; i < repeat*(uptime+sleep)*1000/tikMs; i++ {

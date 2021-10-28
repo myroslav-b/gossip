@@ -5,6 +5,8 @@ import (
 	"io"
 	"net"
 	"time"
+
+	contentmanager "github.com/myroslav-b/gossip/internal/gossip/contentManager"
 )
 
 type TraficControler interface {
@@ -41,11 +43,13 @@ func sendMessage(rdr io.Reader, addrStr string) error {
 	}
 
 	buf, err := rdrToBuf(rdr)
-	if err != nil {
+	if (err != nil) && (err != contentmanager.ErrContentBufferEmpty) {
 		return err
 	}
 
-	conn.Write(buf)
+	if err != contentmanager.ErrContentBufferEmpty {
+		conn.Write(buf)
+	}
 
 	return nil
 }
@@ -57,12 +61,13 @@ func rdrToBuf(rdr io.Reader) ([]byte, error) {
 	for {
 		numBytes, err := rdr.Read(buffer)
 		bigBuffer = append(bigBuffer, buffer[:numBytes]...)
-		if err == io.EOF {
-			break
-		}
-		if (err != io.EOF) && (err != nil) {
+		switch {
+		case err == io.EOF:
+			return bigBuffer, nil
+		case err == contentmanager.ErrContentBufferEmpty:
+			return bigBuffer, contentmanager.ErrContentBufferEmpty
+		case (err != io.EOF) && (err != nil) && (err != contentmanager.ErrContentBufferEmpty):
 			return nil, err
 		}
 	}
-	return bigBuffer, nil
 }

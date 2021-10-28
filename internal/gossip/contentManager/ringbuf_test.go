@@ -26,13 +26,13 @@ func TestAdd(t *testing.T) {
 			t int
 			r [][]byte
 			a []byte
-		}{5, 2, [][]byte{{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {}}, []byte{9}},
+		}{6, 2, [][]byte{{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {}}, []byte{9}},
 			struct {
 				h int
 				t int
 				r [][]byte
 				b bool
-			}{6, 2, [][]byte{{0}, {1}, {2}, {3}, {4}, {5}, {9}, {7}, {8}, {}}, true}},
+			}{7, 2, [][]byte{{0}, {1}, {2}, {3}, {4}, {5}, {9}, {7}, {8}, {}}, true}},
 		{struct {
 			h int
 			t int
@@ -44,7 +44,7 @@ func TestAdd(t *testing.T) {
 				t int
 				r [][]byte
 				b bool
-			}{1, 0, [][]byte{{0}, {}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {}}, true}},
+			}{1, 0, [][]byte{{}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {}}, true}},
 		{struct {
 			h int
 			t int
@@ -56,7 +56,7 @@ func TestAdd(t *testing.T) {
 				t int
 				r [][]byte
 				b bool
-			}{0, 1, [][]byte{{9}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {}}, true}},
+			}{0, 1, [][]byte{{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}}, true}},
 		{struct {
 			h int
 			t int
@@ -68,7 +68,7 @@ func TestAdd(t *testing.T) {
 				t int
 				r [][]byte
 				b bool
-			}{6, 5, [][]byte{{0}, {1}, {2}, {3}, {4}, {5}, {0}, {7}, {8}, {}}, true}},
+			}{6, 5, [][]byte{{0}, {1}, {2}, {3}, {4}, {0}, {6}, {7}, {8}, {}}, true}},
 		{struct {
 			h int
 			t int
@@ -80,7 +80,7 @@ func TestAdd(t *testing.T) {
 				t int
 				r [][]byte
 				b bool
-			}{0, 9, [][]byte{{9}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {}}, true}},
+			}{0, 9, [][]byte{{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}}, true}},
 		{struct {
 			h int
 			t int
@@ -92,7 +92,19 @@ func TestAdd(t *testing.T) {
 				t int
 				r [][]byte
 				b bool
-			}{3, 5, [][]byte{{0}, {1}, {2}, {99}, {4}, {5}, {6}, {7}, {8}, {}}, true}},
+			}{3, 5, [][]byte{{0}, {1}, {99}, {3}, {4}, {5}, {6}, {7}, {8}, {}}, true}},
+		{struct {
+			h int
+			t int
+			r [][]byte
+			a []byte
+		}{2, 5, [][]byte{{0}, {1}, {199}, {3}, {4}, {5}, {6}, {7}, {8}, {}}, []byte{2}},
+			struct {
+				h int
+				t int
+				r [][]byte
+				b bool
+			}{3, 5, [][]byte{{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {}}, true}},
 		{struct {
 			h int
 			t int

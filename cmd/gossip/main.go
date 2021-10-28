@@ -52,7 +52,7 @@ func main() {
 		return listen.Listen(ctx /*&b,*/, opts.AddrGroup)
 	})
 
-	tm := traficmanager.New(ctx, opts.MinUptimeServer, opts.MaxUptimeServer, opts.MinSleepServer, opts.MaxSleepServer)
+	tm := traficmanager.New(opts.MinUptimeServer, opts.MaxUptimeServer, opts.MinSleepServer, opts.MaxSleepServer)
 
 	g.Go(func() error {
 		return talk.Talk(ctx, content, tm, opts.AddrGroup, opts.FreqSendServer)
