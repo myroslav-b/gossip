@@ -22,7 +22,7 @@ var opts struct {
 	MaxUptimeServer uint32 `short:"U" long:"maxuptime" env:"MAX_UPTIME_SERVER" default:"4" description:"maximum uptime of multicast server in seconds"`
 	MinSleepServer  uint32 `short:"s" long:"minsleep" env:"MIN_SLEEP_SERVER" default:"2" description:"minimum sleep time of multicast server in seconds"`
 	MaxSleepServer  uint32 `short:"S" long:"maxsleep" env:"MAX_SLEEP_SERVER" default:"3" description:"maximum sleep time of multicast server in seconds"`
-	FreqSendServer  uint32 `short:"f" long:"freqsend" env:"FREQ_SEND_SERVER" default:"1" description:"frequency of sending data by server per second"`
+	FreqSendServer  uint32 `short:"f" long:"freqsend" env:"FREQ_SEND_SERVER" default:"10" description:"frequency of sending data by server per second"`
 	Dbg             bool   `long:"dbg" description:"debug mode"`
 }
 
@@ -40,18 +40,16 @@ func main() {
 
 	g, ctx := errgroup.WithContext(context.Background())
 
-	content := contentmanager.New(os.Stdin, opts.NameSender)
+	g.Go(func() error {
+		return listen.Listen(ctx, os.Stdout, opts.AddrGroup)
+	})
 
+	content := contentmanager.New(os.Stdin, opts.NameSender)
 	g.Go(func() error {
 		return content.Manager(ctx)
 	})
 
-	g.Go(func() error {
-		return listen.Listen(ctx /*&b,*/, opts.AddrGroup)
-	})
-
 	tm := traficmanager.New(opts.MinUptimeServer, opts.MaxUptimeServer, opts.MinSleepServer, opts.MaxSleepServer)
-
 	g.Go(func() error {
 		return talk.Talk(ctx, content, tm, opts.AddrGroup, opts.FreqSendServer)
 	})

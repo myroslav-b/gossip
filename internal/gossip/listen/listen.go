@@ -2,7 +2,8 @@ package listen
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"io"
 	"net"
 )
 
@@ -10,7 +11,7 @@ const (
 	maxDatagramSize = 8192
 )
 
-func Listen(ctx context.Context /*wtr io.Writer,*/, addrStr string) error {
+func Listen(ctx context.Context, wrt io.Writer, addrStr string) error {
 	addr, err := net.ResolveUDPAddr("udp4", addrStr)
 	if err != nil {
 		return err
@@ -30,11 +31,12 @@ func Listen(ctx context.Context /*wtr io.Writer,*/, addrStr string) error {
 		default:
 			buffer := make([]byte, maxDatagramSize)
 			numBytes, _, err := conn.ReadFromUDP(buffer)
+			fmt.Fprintln(wrt, string(buffer[:numBytes]))
 			if err != nil {
 				return err
 			}
 
-			log.Print(string(buffer[:numBytes]))
+			//log.Print(string(buffer[:numBytes]))
 		}
 	}
 }
