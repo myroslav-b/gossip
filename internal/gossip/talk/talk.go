@@ -41,6 +41,7 @@ func sendMessage(rdr io.Reader, addrStr string) error {
 	if err != nil {
 		return err
 	}
+	defer conn.Close()
 
 	buf, err := rdrToBuf(rdr)
 	if (err != nil) && (err != contentmanager.ErrContentBufferEmpty) {
@@ -48,7 +49,10 @@ func sendMessage(rdr io.Reader, addrStr string) error {
 	}
 
 	if err != contentmanager.ErrContentBufferEmpty {
-		conn.Write(buf)
+		_, err = conn.Write(buf)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -44,10 +44,10 @@ func New(r io.Reader, name string) *Content {
 }
 
 func (c *Content) Manager(ctx context.Context) error {
-	var errInput error
+	chErrInput := make(chan error)
 	go func() {
+		scanner := bufio.NewScanner(c.reader)
 		for {
-			scanner := bufio.NewScanner(c.reader)
 			c.Lock()
 			prefix := []byte(strings.Join([]string{c.name, ": "}, ""))
 			c.Unlock()
@@ -64,7 +64,7 @@ func (c *Content) Manager(ctx context.Context) error {
 			}
 			err := scanner.Err()
 			if err != nil {
-				errInput = err
+				chErrInput <- err
 				return
 			}
 		}
@@ -73,10 +73,8 @@ func (c *Content) Manager(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		default:
-			if errInput != nil {
-				return errInput
-			}
+		case errInput := <-chErrInput:
+			return errInput
 		}
 	}
 }

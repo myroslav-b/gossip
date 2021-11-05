@@ -24,12 +24,13 @@ func Listen(ctx context.Context, wrt io.Writer, addrStr string) error {
 
 	conn.SetReadBuffer(maxDatagramSize)
 
+	buffer := make([]byte, maxDatagramSize)
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			buffer := make([]byte, maxDatagramSize)
+			//buffer := make([]byte, maxDatagramSize)
 			numBytes, _, err := conn.ReadFromUDP(buffer)
 			fmt.Fprintln(wrt, string(buffer[:numBytes]))
 			if err != nil {
