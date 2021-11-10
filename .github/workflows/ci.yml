@@ -21,14 +21,14 @@ jobs:
       working-directory: internal/gossip
 
     - name: Build to Linux
-      if: github.event_name == 'push' && github.ref == 'refs/heads/master' && github.event.ref_type == 'tag'
+      if: github.event_name == 'push' && github.event.ref_type == 'tag'
       run: go build -ldflags "-X main.revision=$(REVISION)"
       working-directory: cmd/gossip
       env:
         REVISION: ${{github.ref_name}}
 
     - name: Build to Win64
-      if: github.event_name == 'push' && github.ref == 'refs/heads/master' && github.event.ref_type == 'tag'
+      if: github.event_name == 'push' && github.event.ref_type == 'tag'
       run: go build -ldflags "-X main.revision=$(REVISION)" -o gossip64.exe
       working-directory: cmd/gossip
       env:
@@ -37,7 +37,7 @@ jobs:
         REVISION: ${{github.ref_name}}
 
     - name: Build to Win32
-      if: github.event_name == 'push' && github.ref == 'refs/heads/master' && github.event.ref_type == 'tag'
+      if: github.event_name == 'push' && github.event.ref_type == 'tag'
       run: go build -ldflags "-X main.revision=$(REVISION)" -o gossip32.exe
       working-directory: cmd/gossip
       env:
