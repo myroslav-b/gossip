@@ -7,14 +7,13 @@ on:
   pull_request:
 
 jobs:
-  strategy:
-    matrix:
-      goos: [Linux, Windows]
-      goarch: [386, amd64]
-
-  test:
+  test-and-build:
     name: Test project
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [Linux, Windows]
+        goarch: [386, amd64]
 
     steps:
       - name: Set up Go 1.15
