@@ -27,7 +27,7 @@ jobs:
         run: go test -v ./...
         working-directory: internal/gossip
       - name: Build
-        run: go build -ldflags "-X main.revision=$(REVISION)" -o gossip_${GOOS}_${GOARCH}
+        run: go build -ldflags "-X main.revision=${REVISION}" -o gossip_${GOOS}_${GOARCH}
         working-directory: cmd/gossip
         env:
           GOOS: ${{matrix.goos}}
