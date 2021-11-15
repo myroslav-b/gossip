@@ -1,0 +1,45 @@
+name: Release Go project
+
+on: 
+  push:
+    tags:
+      - "*"
+
+jobs:
+  strategy:
+    matrix:
+      go-v: [1.15, 1.16]
+
+  release:
+    name: Release project
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Set up Go 1.15
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{matrix.go-v}}
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: internal/gossip
+
+    - name: Run GoReleaser
+      uses: goreleaser/goreleaser-action@v2
+      with:
+        # either 'goreleaser' (default) or 'goreleaser-pro'
+        distribution: goreleaser
+        version: latest
+        args: release --rm-dist
+        workdir: cmd/gossip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
+        # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
