@@ -2,8 +2,8 @@ name: Push and pull-request project
 
 on: 
   push:
-    tags-ignore:
-      - "v*"
+    #tags-ignore:
+    #  - "v*"
   pull_request:
 
 jobs:
