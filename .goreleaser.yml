@@ -1,0 +1,42 @@
+project_name: gossip
+
+env:
+  - GO111MODULE=on
+  - CGO_ENABLED=0
+
+builds:
+  - id: linux-amd64
+    #binary: gossip-linux-amd64
+    dir: .
+    main: ./cmd/gossip
+    goos:
+      - linux
+    goarch:
+      - amd64
+
+  - id: linux-386
+    #binary: gossip-linux-386
+    dir: .
+    main: ./cmd/gossip
+    goos:
+      - linux
+    goarch:
+      - 386
+
+  - id: windows-amd64
+    #binary: gossip-windows-amd64.exe
+    dir: .
+    main: ./cmd/gossip
+    goos:
+      - windows
+    goarch:
+      - amd64
+
+  - id: windows-386
+    #binary: gossip-windws-386.exe
+    dir: .
+    main: ./cmd/gossip
+    goos:
+      - windows
+    goarch:
+      - 386
