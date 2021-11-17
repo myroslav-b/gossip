@@ -20,7 +20,7 @@ builds:
     #binary: gossip-linux-386
     dir: .
     main: ./cmd/gossip
-        ldflags:
+    ldflags:
       - -s -w -X main.revision=${REVISION}
     goos:
       - linux
@@ -31,7 +31,7 @@ builds:
     #binary: gossip-windows-amd64.exe
     dir: .
     main: ./cmd/gossip
-        ldflags:
+    ldflags:
       - -s -w -X main.revision=${REVISION}
     goos:
       - windows
@@ -42,7 +42,7 @@ builds:
     #binary: gossip-windws-386.exe
     dir: .
     main: ./cmd/gossip
-        ldflags:
+    ldflags:
       - -s -w -X main.revision=${REVISION}
     goos:
       - windows
