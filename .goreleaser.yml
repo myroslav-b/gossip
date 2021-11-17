@@ -9,6 +9,8 @@ builds:
     #binary: gossip-linux-amd64
     dir: .
     main: ./cmd/gossip
+    ldflags:
+      - -s -w -X main.revision=${REVISION}
     goos:
       - linux
     goarch:
@@ -18,6 +20,8 @@ builds:
     #binary: gossip-linux-386
     dir: .
     main: ./cmd/gossip
+        ldflags:
+      - -s -w -X main.revision=${REVISION}
     goos:
       - linux
     goarch:
@@ -27,6 +31,8 @@ builds:
     #binary: gossip-windows-amd64.exe
     dir: .
     main: ./cmd/gossip
+        ldflags:
+      - -s -w -X main.revision=${REVISION}
     goos:
       - windows
     goarch:
@@ -36,6 +42,8 @@ builds:
     #binary: gossip-windws-386.exe
     dir: .
     main: ./cmd/gossip
+        ldflags:
+      - -s -w -X main.revision=${REVISION}
     goos:
       - windows
     goarch:
