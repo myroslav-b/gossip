@@ -15,7 +15,7 @@ builds:
     dir: .
     main: ./cmd/gossip
     ldflags:
-      - -s -w -X main.revision={{github.ref_name}}
+      - -s -w -X main.revision={{.Tag}}
     goos:
       - linux
     goarch:
@@ -26,7 +26,7 @@ builds:
     dir: .
     main: ./cmd/gossip
     ldflags:
-      - -s -w -X main.revision={{github.ref_name}}
+      - -s -w -X main.revision={{.Tag}}
     goos:
       - linux
     goarch:
@@ -37,7 +37,7 @@ builds:
     dir: .
     main: ./cmd/gossip
     ldflags:
-      - -s -w -X main.revision={{github.ref_name}}
+      - -s -w -X main.revision={{.Tag}}
     goos:
       - windows
     goarch:
@@ -48,7 +48,7 @@ builds:
     dir: .
     main: ./cmd/gossip
     ldflags:
-      - -s -w -X main.revision={{github.ref_name}}
+      - -s -w -X main.revision={{.Tag}}
     goos:
       - windows
     goarch:
