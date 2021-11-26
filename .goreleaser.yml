@@ -4,13 +4,18 @@ env:
   - GO111MODULE=on
   - CGO_ENABLED=0
 
+archives:
+  - format_overrides:
+      - goos: windows
+        format: zip
+
 builds:
   - id: linux-amd64
     #binary: gossip-linux-amd64
     dir: .
     main: ./cmd/gossip
     ldflags:
-      - -s -w -X main.revision=${REVISION}
+      - -s -w -X main.revision={{.Ref_name}}
     goos:
       - linux
     goarch:
@@ -21,7 +26,7 @@ builds:
     dir: .
     main: ./cmd/gossip
     ldflags:
-      - -s -w -X main.revision=${REVISION}
+      - -s -w -X main.revision={{.Ref_name}}
     goos:
       - linux
     goarch:
@@ -32,7 +37,7 @@ builds:
     dir: .
     main: ./cmd/gossip
     ldflags:
-      - -s -w -X main.revision=${REVISION}
+      - -s -w -X main.revision={{.Ref_name}}
     goos:
       - windows
     goarch:
@@ -43,7 +48,7 @@ builds:
     dir: .
     main: ./cmd/gossip
     ldflags:
-      - -s -w -X main.revision=${REVISION}
+      - -s -w -X main.revision={{.Ref_name}}
     goos:
       - windows
     goarch:
